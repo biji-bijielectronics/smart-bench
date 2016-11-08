@@ -27,14 +27,20 @@ def background_thread():
     while True:
         count = 0
 
-        item = pubsub.get_message()
-        if item is not None:
+        item1 = pubsub.get_message()
+        item2 = pubsub.get_message()
+        if item1 is not None:
             count += 1
-            msg = str(item['data'])
+            msg = str(item1['data'])
             print "sending: " + msg
             sio.emit('my response', {'data': msg},
-                 namespace='/test')  
-        sio.sleep(0.01)        
+                    namespace='/test')
+        if item2 is not None:
+            msgc = str(item2['data'])
+            print "sending: " + msgc
+            sio.emit('my responsec', {'data': msgc},
+                     namespace='/test')
+        sio.sleep(0.01)            
 
 
 @app.route('/')
@@ -49,24 +55,14 @@ def index():
 def test_message(sid, message):
     sio.emit('my response', {'data': message['data']}, room=sid,
              namespace='/test')
-
-
-
-
-@sio.on('disconnect request', namespace='/test')
-def disconnect_request(sid):
-    sio.disconnect(sid, namespace='/test')
-
-
-@sio.on('connect', namespace='/test')
-def test_connect(sid, environ):
-    sio.emit('my response', {'data': 'Connected', 'count': 0}, room=sid,
+			 
+@sio.on('my eventc', namespace='/test')			 
+def test_message(sid, message):
+	sio.emit('my responsec', {'data': message['data']}, room=sid,
              namespace='/test')
 
 
-@sio.on('disconnect', namespace='/test')
-def test_disconnect(sid):
-    print('Client disconnected')
+
 
 
 if __name__ == '__main__':

@@ -1,0 +1,7 @@
+echo "setting up shutdown"
+#sudo python /home/pi/shutdown.py&
+echo "setting IP address"
+sudo ifconfig wlan0 192.168.100.114 netmask 255.255.255.0
+echo "running energy calc"
+sudo python /home/pi/smart-bench/differential.py &
+python /home/pi/smart-bench/server.py &

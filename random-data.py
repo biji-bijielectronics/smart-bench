@@ -25,7 +25,10 @@ def get_voltage():
 while True:
 	v = get_voltage()
 	c = get_current()
-	msg = {'voltage': v, 'current': c}
+	msg = v
+	msgc = c
 	r.publish('adc', msg)
+	r.publish('adc', msgc)
 	print msg
+	print msgc
 	time.sleep(0.5)

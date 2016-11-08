@@ -6,11 +6,11 @@ import time
 # Import the ADS1x15 module.
 import Adafruit_ADS1x15
 #import numpy as np
-
+import redis
 
 # Create an ADS1115 ADC (16-bit) instance.
 adc = Adafruit_ADS1x15.ADS1115()
-
+r = redis.Redis()
 
 
 # Or create an ADS1015 ADC (12-bit) instance.
@@ -68,7 +68,7 @@ while True:
        if len(current_list) < 40:
           current_list.append(v)
           
-          # print current_list 
+		 # print current_list 
        else:
           averaged_current = sum(current_list)/40
 
@@ -84,11 +84,17 @@ while True:
 
           # print current_list
        else:
-          averaged_voltage = sum(voltage_list)/40
-
-          print round(averaged_voltage*100,1),round(averaged_current,1)
-          voltage_list = []
-          voltage_list.insert(0,round(averaged_voltage,1))
+		averaged_voltage = sum(voltage_list)/40
+		msg = round(averaged_voltage*100,1)
+		#msg = volts + 'V'
+		msgc = round(averaged_current,1)
+		#msgc = amps + 'Amp'
+		r.publish('adc', msg)
+		r.publish('adc', msgc)
+		print msg
+		print msgc
+		voltage_list = []
+		voltage_list.insert(0,round(averaged_voltage,1))
 
   
        
