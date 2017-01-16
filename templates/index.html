@@ -53,10 +53,8 @@
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 	<script type="text/javascript" src="static/jquery-2.1.4.min.js"></script>
 	<script type="text/javascript" src="static/socket.io.min.js"></script>
-	<script type="text/javascript" src="static/canvasjs.min.js"></script> <!-- ЗАСУНЬ в папку в js и поменять path -->
+	<script type="text/javascript" src="static/canvasjs.min.js"></script> 
 	<script type ="text/javascript" src="static/bootstrap.min.js"></script>
-
-
 	<script type="text/javascript" charset="utf-8">
 		var volt = 0;
 		var amp = 0;
@@ -108,150 +106,199 @@
 			});
 
 		});
-	
-	window.onload = function() {
+
 		// dataPoints
 		var dataPoints1 = [];
 		var dataPoints2 = [];
 		var dataPoints3 = [];
 
-		var chart = new CanvasJS.Chart("chartContainer",{
-			zoomEnabled: true,
-			animationEnabled: true,
-			animationDuration: 500,
-			theme: "theme2",
-			toolTip: {
-				shared: true
-			},
-			legend: {
-				verticalAlign: "top",
-				horizontalAlign: "center",
-				fontSize: 14,
-				fontWeight: "bold",
-				fontFamily: "calibri",
-				fontColor: "dimGrey"
-			},
-			axisY:{
-				includeZero: false
-			},
-			data: [{
-				// dataSeries1
-				type: "line",
-				markerType: "square",
-				color: "gold",
-				xValueType: "dateTime",
-				showInLegend: true,
-				name: "Voltage",
-				dataPoints: dataPoints1
-			},
-			{
-			// dataSeries2
-				type: "line",
-				markerType: "square",
-				color: "blue",
-				xValueType: "dateTime",
-				showInLegend: true,
-				name: "Current" ,
-				dataPoints: dataPoints2
-			},
-			{
+		function drawChart() {
+			var chart = new CanvasJS.Chart("chartContainer",{
+				zoomEnabled: true,
+				animationEnabled: true,
+				animationDuration: 500,
+				theme: "theme2",
+				toolTip: {
+					shared: true
+				},
+				legend: {
+					verticalAlign: "top",
+					horizontalAlign: "center",
+					fontSize: 14,
+					fontWeight: "bold",
+					fontFamily: "calibri",
+					fontColor: "dimGrey"
+				},
+				axisY:{
+					includeZero: false
+				},
+				data: [{
+					// dataSeries1
+					type: "line",
+					color: "gold",
+					showInLegend: true,
+					name: "Voltage",
+					dataPoints: dataPoints1
+				},
+				{
 				// dataSeries2
-				type: "line",
-				markerType: "square",
-				color: "red",
-				xValueType: "dateTime",
-				showInLegend: true,
-				name: "Power" ,
-				dataPoints: dataPoints3
-			}],
-			legend:{
-				cursor:"pointer",
-				itemclick : function(e) {
-					e.dataSeries.visible = !(typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible);
-					chart.render();
+					type: "line",
+					color: "blue",
+					showInLegend: true,
+					name: "Current" ,
+					dataPoints: dataPoints2
+				},
+				{
+					// dataSeries3
+					type: "line",
+					color: "red",
+					showInLegend: true,
+					name: "Power" ,
+					dataPoints: dataPoints3
+				}],
+				legend:{
+					cursor:"pointer",
+					itemclick : function(e) {
+						e.dataSeries.visible = !(typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible);
+						chart.render();
+					}
 				}
-			}
-		});
+			});
+			return chart;
+		}
+		
+		window.onload = function() {
 
-		var updateInterval = 1000;
-			// initial value
+			var seconds = 00; 
+			var tens = 00; 
+			var appendTens = document.getElementById("tens")
+			var appendSeconds = document.getElementById("seconds")
+			var buttonStart = document.getElementById('submitStartButton');
+		 	var buttonStop = document.getElementById('submitStopButton');
+			var buttonReset = document.getElementById('submitResetButton');
+			var Interval ;
 
-		var time0 = new Date;
+			var chart = drawChart();
 
-			// starting at 9.30 am
+			var updateInterval = 1000;
+				// initial value
 
-		var updateChart = function (count) {
-			count = count || 1;
+			var time0 = new Date;
 
-				// count is number of times loop runs to generate random dataPoints.
+				// starting at 9.30 am
 
-			for (var i = 0; i < count; i++) {
+			var updateChart = function (count) {
+				count = count || 1;
 
-					// add interval duration to time
-					//time.setTime(startTime.getTime() - time.getTime() + updateInterval);
+					// count is number of times loop runs to generate random dataPoints.
 
-				time0.setTime(time0.getTime()+ updateInterval);
+				for (var i = 0; i < count; i++) {
+						// generating random values
+						//var deltaY1 = .5 + Math.random() *(-.5-.5);
+						//var deltaY2 = .5 + Math.random() *(-.5-.5);
 
-					// generating random values
-					//var deltaY1 = .5 + Math.random() *(-.5-.5);
-					//var deltaY2 = .5 + Math.random() *(-.5-.5);
-
-					// adding random value and rounding it to two digits.
-
-
-					// pushing the new values
-				dataPoints1.push({
-					x: time0.getTime(),
-					y: volt
-				});
-				dataPoints2.push({
-					x: time0.getTime(),
-					y: amp
-				});
-				dataPoints3.push({
-					x: time0.getTime(),
-					y: power
-				});
-			}
-			// updating legend text with  updated with y Value
-			chart.render();
-		};
-
-		// generates first set of dataPoints
-		// updateChart(0);
-
-		// // update chart after specified interval
-		// setInterval(function(){updateChart()}, updateInterval);
-
-		var timeoutId,
-			startButton = document.getElementById('submitStartButton'),
-			stopButton = document.getElementById('submitStopButton'),
-			resetButton = document.getElementById('submitResetButton');
-
-		function startLiveChart() {
+						// pushing the new values
+					dataPoints1.push({
+						x: seconds,
+						y: volt
+					});
+					dataPoints2.push({
+						x: seconds,
+						y: amp
+					});
+					dataPoints3.push({
+						x: seconds,
+						y: power					
+					});
+				}
+				// updating legend text with  updated with y Value
+				chart.render();
+			};
 			updateChart(0);
-			timeoutId = setInterval(function(){updateChart()}, updateInterval);
-			startButton.removeEventListener('click', startLiveChart);
-			stopButton.addEventListener('click', stopLiveChart);
-			resetButton.addEventListener('click', resetLiveChart);
+
+			var timeoutId,
+				startButton = document.getElementById('submitStartButton'),
+				stopButton = document.getElementById('submitStopButton'),
+				resetButton = document.getElementById('submitResetButton');
+
+			function startLiveChart() {
+				updateChart(0);
+				timeoutId = setInterval(function(){updateChart()}, updateInterval);
+				startButton.removeEventListener('click', startLiveChart);
+				stopButton.addEventListener('click', stopLiveChart);
+				resetButton.addEventListener('click', resetLiveChart);
+			}
+
+			function stopLiveChart() {
+				clearTimeout(timeoutId);
+			  	stopButton.removeEventListener('click', stopLiveChart);
+			  	startButton.addEventListener('click', startLiveChart);
+			  	resetButton.addEventListener('click', resetLiveChart);
+			}
+
+			function resetLiveChart() {
+				clearTimeout(timeoutId);
+				chart.options.data[0].dataPoints = [];
+				chart.options.data[1].dataPoints = [];
+				dataPoints1 = [];
+				dataPoints2 = [];
+				dataPoints3 = [];
+				chart = drawChart();
+				chart.render();
+			  	resetButton.removeEventListener('click', resetLiveChart);
+			  	startButton.addEventListener('click', startLiveChart);
+			}    
+
+			startButton.addEventListener('click', startLiveChart);
+
+			
+
+			buttonStart.onclick = function() {
+			     clearInterval(Interval);
+			     Interval = setInterval(startTimer, 10);
+			}
+			  
+			buttonStop.onclick = function() {
+			       clearInterval(Interval);
+			}
+			  
+
+			buttonReset.onclick = function() {
+			     clearInterval(Interval);
+			    tens = "00";
+			  	seconds = "00";
+			    appendTens.innerHTML = tens;
+			  	appendSeconds.innerHTML = seconds;
+			}
+			  
+			   
+			  
+			function startTimer () {
+			    tens++; 
+			    
+			    if(tens < 9){
+			      appendTens.innerHTML = "0" + tens;
+			    }
+			    
+			    if (tens > 9){
+			      appendTens.innerHTML = tens;
+			      
+			    } 
+			    
+			    if (tens > 99) {
+			      console.log("seconds");
+			      seconds++;
+			      appendSeconds.innerHTML = "0" + seconds;
+			      tens = 0;
+			      appendTens.innerHTML = "0" + 0;
+			    }
+			    
+			    if (seconds > 9){
+			      appendSeconds.innerHTML = seconds;
+			    }
+			  
+			}
 		}
-
-		function stopLiveChart() {
-			clearTimeout(timeoutId);
-		  	stopButton.removeEventListener('click', stopLiveChart);
-		  	startButton.addEventListener('click', startLiveChart);
-		  	resetButton.addEventListener('click', resetLiveChart);
-		}
-
-		function resetLiveChart() {
-			clearTimeout(timeoutId);
-			chart.destroy();
-		  	resetButton.removeEventListener('click', resetLiveChart);
-		  	startButton.addEventListener('click', startLiveChart);
-		}    
-
-		startButton.addEventListener('click', startLiveChart);
-	}
 	</script>
 </head>
 
@@ -272,9 +319,9 @@
 			<table align="center", border="5", bordercolor="black" bgcolor="white" width="300" height="50">
 				<thead>
 				<tr>
-					<th>Voltage</th>
-					<th>Power (W)</th>
-					<th>Current</th>
+					<th style="text-align:center">Voltage</th>
+					<th style="text-align:center">Power (W)</th>
+					<th style="text-align:center">Current</th>
 
 				</tr>
 				</thead>
@@ -300,6 +347,7 @@
 	<row>
 		<col-xs-12>
 			<div align="center">
+				<p><span id="seconds">00</span>:<span id="tens">00</span></p>
 				<button id="submitStartButton" type="submit" value="Start">Start</button>
 				<button id="submitStopButton" type="submit" value="Stop">Stop</button>
 				<button id="submitResetButton" type="submit" value="Reset">Reset</button>
